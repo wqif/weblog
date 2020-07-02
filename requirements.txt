@@ -1,0 +1,2 @@
+django==3.0.7
+django-mysql==2.4.1
