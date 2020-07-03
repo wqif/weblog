@@ -77,6 +77,20 @@ class PostAdmin(BaseOwnerAdmin):
         }),
     )
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        ''' 对一对多字段进程过滤 '''
+        if db_field.name == "category":
+            kwargs["queryset"] = Category.objects.filter(status=Category.STATUS_NORMAL, owner=request.user)
+
+        return super(PostAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        ''' 对多对多字段进程过滤 '''
+        if db_field.name == "tag":
+            kwargs["queryset"] = Tag.objects.filter(status=Tag.STATUS_NORMAL, owner=request.user)
+
+        return super(PostAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
 
 @admin.register(LogEntry, site=cus_site)
 class LogEntryAdmin(admin.ModelAdmin):
