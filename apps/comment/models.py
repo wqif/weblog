@@ -21,5 +21,8 @@ class Comment(models.Model):
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='评论用户')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
 
+    def __str__(self):
+        return str(self.id) + "-" + str(self.content)
+
     class Meta:
         verbose_name = verbose_name_plural = '评论信息'

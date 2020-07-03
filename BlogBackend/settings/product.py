@@ -14,7 +14,7 @@ DEBUG = False
 # 跨域增加忽略
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ('127.0.0.1:80', 'localhost:80')
+CORS_ORIGIN_WHITELIST = ('http://127.0.0.1:80','http://localhost:80')
 
 CORS_ALLOW_METHODS = (
     'DELETE',
