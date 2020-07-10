@@ -16,6 +16,19 @@ class Category(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='作者')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
 
+    @classmethod
+    def get_navs(cls):
+        categories = cls.objects.filter(status=cls.STATUS_NORMAL)
+        nav_categories = []
+        normal_categories = []
+        # QuerySet的懒惰性在使用到数据时才会访问数据库,避免两次访问数据库, 选择一次查询在内存中将数据拆分
+        for category in categories:
+            if category.is_nav:
+                nav_categories.append(category)
+            else:
+                normal_categories.append(category)
+        return {'navs': nav_categories, 'categories': normal_categories}
+
     def __str__(self):
         return str(self.id) + "-" + str(self.name)
 
@@ -34,7 +47,6 @@ class Tag(models.Model):
     status = models.PositiveIntegerField(default=STATUS_NORMAL, choices=STATUS_ITEMS, verbose_name='标签状态')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='作者')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
-
 
     def __str__(self):
         return str(self.id) + "-" + str(self.name)
@@ -61,6 +73,37 @@ class Post(models.Model):
     tag = models.ManyToManyField(Tag, verbose_name='文章标签')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='作者')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+
+    pv = models.PositiveIntegerField(default=1, verbose_name='访问量')
+    uv = models.PositiveIntegerField(default=1)
+
+    @classmethod
+    def hot_posts(cls):
+        return cls.objects.filter(status=cls.STATUS_NORMAL).order_by('-pv').only('pv', 'uv')
+
+    @staticmethod
+    def get_by_tag(tag_id):
+        try:
+            tag = Tag.objects.get(id=tag_id)
+            post_list = tag.post_set.filter(status=Post.STATUS_NORMAL).select_related('owner', 'category')
+        except Tag.DoesNotExist:
+            tag = None
+            post_list = []
+        return post_list, tag
+
+    @staticmethod
+    def get_by_category(category_id):
+        try:
+            category = Category.objects.get(id=category_id)
+            post_list = category.post_set.filter(status=Post.STATUS_NORMAL).select_related('owner', 'category')
+        except Category.DoesNotExist:
+            category = None
+            post_list = []
+        return post_list, category
+
+    @classmethod
+    def latest_posts(cls):
+        return cls.objects.filter(status=cls.STATUS_NORMAL)
 
     def __str__(self):
         return str(self.id) + "-" + str(self.title)

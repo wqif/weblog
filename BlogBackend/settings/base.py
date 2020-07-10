@@ -56,10 +56,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'BlogBackend.urls'
 
+THEME = 'default'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': []
+        'DIRS': [os.path.join(BASE_DIR, 'themes', THEME, 'templates'), ]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -118,4 +119,11 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 
+THEME = 'bootstrap-4.5.0'
+
+STATIC_ROOT = os.path.join(BASE_DIR, '../resources/static')
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'themes', THEME, 'static')
+]
